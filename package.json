@@ -1,0 +1,21 @@
+{
+  "name": "sample-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Vue 3 + Vite 로 만든 운영 대시보드 데모",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.41",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "sass-embedded": "^1.100.0",
+    "vite": "^8.2.1"
+  }
+}

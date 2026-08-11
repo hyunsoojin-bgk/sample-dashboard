@@ -1,0 +1,59 @@
+@use "sass:map";
+
+// ─────────────────────────────────────────────────────────────
+// 브레이크포인트 — 이 프로젝트의 단일 진실 공급원(SSOT).
+// bb8-plex-adminfront 는 560/700/720/1080/1180px 이 파일마다 흩어져 있어
+// 화면마다 꺾이는 지점이 달랐다. 여기서는 다섯 단계로 고정하고
+// SCSS(믹스인)와 JS(useBreakpoint) 가 같은 값을 쓰도록 :root 에도 내보낸다.
+// ─────────────────────────────────────────────────────────────
+
+$breakpoints: (
+    "xs": 480px,  // 모바일 세로
+    "sm": 640px,  // 모바일 가로
+    "md": 768px,  // 태블릿 세로
+    "lg": 1024px, // 태블릿 가로 · 소형 랩탑
+    "xl": 1280px, // 데스크탑
+);
+
+@function bp($name) {
+    @if not map.has-key($breakpoints, $name) {
+        @error "정의되지 않은 브레이크포인트: #{$name}. 사용 가능: #{map.keys($breakpoints)}";
+    }
+    @return map.get($breakpoints, $name);
+}
+
+/// 모바일 퍼스트 — 기본 스타일은 좁은 화면 기준으로 쓰고, 여기서 넓힌다.
+@mixin respond-up($name) {
+    @media (min-width: bp($name)) {
+        @content;
+    }
+}
+
+/// 좁은 화면에서만 덮어써야 할 때(테이블 → 카드 전환 등)만 쓴다.
+@mixin respond-down($name) {
+    @media (max-width: (bp($name) - 0.02px)) {
+        @content;
+    }
+}
+
+@mixin respond-between($from, $to) {
+    @media (min-width: bp($from)) and (max-width: (bp($to) - 0.02px)) {
+        @content;
+    }
+}
+
+/// 마우스가 있는 환경에서만 호버 효과를 준다. 터치에서 호버가 남는 문제를 막는다.
+@mixin hover {
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            @content;
+        }
+    }
+}
+
+/// 브레이크포인트를 CSS 커스텀 프로퍼티로 노출 → JS(useBreakpoint) 가 읽어 쓴다.
+@mixin export-breakpoints {
+    @each $name, $value in $breakpoints {
+        --bp-#{$name}: #{$value};
+    }
+}

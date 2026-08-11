@@ -1,0 +1,82 @@
+// bb8-plex-adminfront/src/styles/_reset.scss 를 기반으로, 반응형에 필요한 항목만 보강했다.
+
+* {
+    margin: 0;
+    padding: 0;
+    word-break: keep-all;
+}
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+    tab-size: 4;
+}
+
+body {
+    // 가로 스크롤은 언제나 버그다. 넘치는 요소는 각자 스크롤 컨테이너를 갖는다.
+    overflow-x: hidden;
+    position: relative;
+
+    // height: 100% 를 주지 않는다.
+    // overflow-x:hidden 과 만나면 body 가 뷰포트 높이의 스크롤 박스가 되어
+    // 문서 스크롤이 죽는다(내용이 넘쳐도 페이지가 안 내려간다).
+    // 전체 높이는 레이아웃 컴포넌트가 min-height: 100dvh 로 잡는다.
+}
+
+dl,
+li,
+menu,
+ol,
+ul {
+    list-style: none;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+strong {
+    font-weight: 700;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -1,0 +1,166 @@
+@use "sass:list";
+@use "sass:map";
+@use "sass:math";
+@use "./breakpoints" as *;
+
+// ─────────────────────────────────────────────────────────────
+// 치수·타이포 (빌드 타임 상수 → SCSS 변수)
+// bb8-plex-adminfront/src/styles/_variables.scss 의 규칙을 따르되,
+// 색은 의미 기반 이름으로 정리했다. (--font-color-1..21 식 번호는 쓰지 않는다)
+// ─────────────────────────────────────────────────────────────
+
+$font-pretendard: "Pretendard Variable", "Pretendard", system-ui, -apple-system,
+    "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+$font-base: 16px;
+
+$header-height: 56px;
+$header-height-mobile: 52px;
+$footer-height: 44px;
+$content-max-width: 1360px;
+
+$radius-sm: 6px;
+$radius: 12px;
+$radius-lg: 16px;
+
+$box-shadow-light: 0 1px 2px rgba(11, 11, 11, 0.05);
+$box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.04);
+$box-shadow-pop: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+// ─────────────────────────────────────────────────────────────
+// 테마 토큰
+// 런타임에 바뀌어야 하므로 CSS 커스텀 프로퍼티로 내보낸다.
+// 라이트/다크 값을 맵으로 한 번만 적고 믹스인으로 찍어, 세 군데 중복을 없앤다.
+//
+// 차트 시리즈 색은 눈대중이 아니라 검증을 통과한 조합이다.
+//   라이트 #2a78d6 / #eb6834 — 인접 CVD ΔE 24.7, 일반 시야 ΔE 33.6, 대비 3:1 이상
+//   다크   #3987e5 / #d95926 — 인접 CVD ΔE 26.8, 일반 시야 ΔE 31.8, 대비 3:1 이상
+// 색을 바꿀 때는 반드시 같은 기준(대비·색각 이상 분리도)을 다시 확인한다.
+// ─────────────────────────────────────────────────────────────
+
+$theme-light: (
+    "page-bg": #f9f9f7,
+    "surface-1": #fcfcfb,
+    "surface-2": #f0efec,
+    "surface-hover": #f2f1ed,
+
+    "font-color-strong": #0b0b0b,
+    "font-color-base": #52514e,
+    "font-color-muted": #898781,
+
+    "border-color": rgba(11, 11, 11, 0.1),
+    "grid-color": #e1e0d9,
+    "axis-color": #c3c2b7,
+
+    "primary-color": #2a78d6,
+    "primary-hover-color": #256abf,
+    "primary-soft-bg": #e8f0fc,
+
+    "series-1": #2a78d6,
+    "series-2": #eb6834,
+
+    "delta-up-color": #006300,
+    "delta-down-color": #d03b3b,
+
+    "shadow": 0 1px 2px rgba(11, 11, 11, 0.05),
+);
+
+$theme-dark: (
+    "page-bg": #0d0d0d,
+    "surface-1": #1a1a19,
+    "surface-2": #232322,
+    "surface-hover": #26261f,
+
+    "font-color-strong": #ffffff,
+    "font-color-base": #c3c2b7,
+    "font-color-muted": #898781,
+
+    "border-color": rgba(255, 255, 255, 0.1),
+    "grid-color": #2c2c2a,
+    "axis-color": #383835,
+
+    "primary-color": #3987e5,
+    "primary-hover-color": #5598e7,
+    "primary-soft-bg": #16263a,
+
+    "series-1": #3987e5,
+    "series-2": #d95926,
+
+    "delta-up-color": #0ca30c,
+    "delta-down-color": #e66767,
+
+    "shadow": none,
+);
+
+// 상태색은 테마와 무관하게 고정한다. 라이트 면에서 warning/serious 는 3:1 미만이라
+// 반드시 아이콘 + 라벨과 함께 쓴다. 색 하나로 상태를 표현하지 않는다.
+$theme-status: (
+    "status-good": #0ca30c,
+    "status-warning": #fab219,
+    "status-serious": #ec835a,
+    "status-critical": #d03b3b,
+);
+
+@mixin emit-tokens($tokens) {
+    @each $name, $value in $tokens {
+        --#{$name}: #{$value};
+    }
+}
+
+/// 실제 `:root` 출력은 global.scss 에서 한 번만 한다.
+/// 이 파일은 모든 SFC 에 자동 주입되므로(vite.config.js 의 additionalData),
+/// 여기서 CSS 를 내보내면 컴포넌트 수만큼 토큰 블록이 복제된다.
+@mixin emit-theme {
+    :root {
+        color-scheme: light;
+        @include emit-tokens($theme-light);
+        @include emit-tokens($theme-status);
+        @include export-breakpoints;
+    }
+
+    // OS 다크 모드 — 사용자가 라이트를 명시적으로 고르지 않았을 때만 적용.
+    @media (prefers-color-scheme: dark) {
+        :root:where(:not([data-theme="light"])) {
+            color-scheme: dark;
+            @include emit-tokens($theme-dark);
+        }
+    }
+
+    // 화면의 테마 토글 — OS 설정을 양방향으로 이긴다.
+    :root[data-theme="dark"] {
+        color-scheme: dark;
+        @include emit-tokens($theme-dark);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 함수·믹스인 (adminfront 와 동일한 시그니처)
+// ─────────────────────────────────────────────────────────────
+
+@function getRem($value) {
+    @if $value == 0 {
+        @return 0;
+    }
+    @return math.div($value, 16) * 1rem;
+}
+
+/// px 숫자를 받아 rem 폰트 크기 + 행간 + 자간까지 한 번에.
+@mixin font($size, $weight: 400) {
+    $rem-size: math.div($size, 16);
+    font-size: #{$rem-size}rem;
+    line-height: #{$rem-size * 1.5}rem;
+    @if $size > 12 {
+        letter-spacing: -0.02em;
+    } @else {
+        letter-spacing: 0;
+    }
+    font-weight: $weight;
+}
+
+/// 화면 폭에 따라 부드럽게 커지는 글자 — 브레이크포인트 없이 처리한다.
+/// 헤드라인·히어로 숫자처럼 크기 차이가 큰 곳에만 쓴다.
+@mixin font-fluid($min, $max, $weight: 600) {
+    font-size: clamp(#{getRem($min)}, #{getRem($min)} + 1.4vw, #{getRem($max)});
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    font-weight: $weight;
+}

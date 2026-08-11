@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- viewport-fit=cover: 노치 있는 기기에서 safe-area 를 쓸 수 있게 한다 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Vue 3 + Vite + SCSS 로 만든 반응형 운영 대시보드 데모" />
+    <meta name="color-scheme" content="light dark" />
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <title>Sample Dashboard</title>
+    <script>
+      // 첫 페인트 전에 테마를 확정해 깜빡임(FOUC)을 막는다.
+      // 저장값이 없으면 아무것도 하지 않고 CSS 의 prefers-color-scheme 에 맡긴다.
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

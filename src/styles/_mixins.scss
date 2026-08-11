@@ -1,0 +1,73 @@
+@use "./variables" as *;
+@use "./breakpoints" as *;
+
+// bb8-plex-adminfront 에서 자주 쓰이는 믹스인을 같은 이름으로 가져왔다.
+// (card_box / ellipsis / display_center / scrollbar)
+
+@mixin card_box {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--surface-1);
+    border: 1px solid var(--border-color);
+    border-radius: $radius;
+    box-shadow: var(--shadow);
+}
+
+@mixin ellipsis {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@mixin ellipsis-lines($lines: 2) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+@mixin display_center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin scrollbar($track: transparent) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--axis-color) $track;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--axis-color);
+        border-radius: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: $track;
+    }
+}
+
+/// 반응형의 기본기 — 미디어 쿼리 없이 카드가 스스로 접히는 그리드.
+/// 열 수를 고정하지 않고 최소 폭만 정한다. 브레이크포인트는 이걸로 안 되는 경우에만.
+@mixin auto-grid($min: 220px, $gap: 16px) {
+    display: grid;
+    gap: $gap;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, $min), 1fr));
+}
+
+/// 터치 접근성 최소 타겟 44×44 (WCAG 2.5.5)
+@mixin touch-target($size: 44px) {
+    min-height: $size;
+    min-width: $size;
+}
+
+@mixin focus-ring($offset: 2px) {
+    &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: $offset;
+        border-radius: $radius-sm;
+    }
+}
